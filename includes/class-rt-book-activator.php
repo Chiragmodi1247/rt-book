@@ -20,7 +20,7 @@
  * @subpackage Plugin_Name/includes
  * @author     Your Name <email@example.com>
  */
-class Plugin_Name_Activator {
+class Rt_Book_Activator {
 
 	/**
 	 * Short Description. (use period)

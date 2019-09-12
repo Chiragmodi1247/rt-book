@@ -13,7 +13,7 @@
  * @package           Rt_Book
  *
  * @wordpress-plugin
- * Plugin Name:       RT Book
+ * Plugin Name:       Rt_Book
  * Description:       A plugin to handle information about a book.
  * Version:           1.0.0
  * Author:            Chirag Modi
@@ -75,3 +75,19 @@ function run_rt_book() {
 
 }
 run_rt_book();
+
+function rt_book_custom_post_type()
+{
+    register_post_type('rt_book_post',
+                       array(
+                           'labels'      => array(
+                               'name'          => __('Books'),
+                               'singular_name' => __('Book'),
+                           ),
+                           'public'      => true,
+                           'has_archive' => true,
+                           'rewrite'     => array( 'slug' => 'books' ), // my custom slug
+                       )
+    );
+}
+add_action('init', 'rt_book_custom_post_type');
