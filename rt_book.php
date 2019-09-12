@@ -78,16 +78,30 @@ run_rt_book();
 
 function rt_book_custom_post_type()
 {
-    register_post_type('rt_book_post',
-                       array(
-                           'labels'      => array(
-                               'name'          => __('Books'),
-                               'singular_name' => __('Book'),
-                           ),
-                           'public'      => true,
-                           'has_archive' => true,
-                           'rewrite'     => array( 'slug' => 'books' ), // my custom slug
-                       )
-    );
+
+	$labels = array(
+		'name'               => _x( 'Books', 'post type general name' ),
+		'singular_name'      => _x( 'Book', 'post type singular name' ),
+		'add_new'            => _x( 'Add New', 'book' ),
+		'add_new_item'       => __( 'Add New Book' ),
+		'edit_item'          => __( 'Edit Book' ),
+		'new_item'           => __( 'New Book' ),
+		'all_items'          => __( 'All Books' ),
+		'view_item'          => __( 'View Book' ),
+		'search_items'       => __( 'Search Books' ),
+		'not_found'          => __( 'No Books found' ),
+		'not_found_in_trash' => __( 'No Books found in the Trash' ), 
+		// 'parent_item_colon'  => ’,
+		'menu_name'          => 'Books'
+	  );
+	  $args = array(
+		'labels'        => $labels,
+		'description'   => 'Holds our Books and Book specific data',
+		'public'        => true,
+		'menu_position' => 5,
+		'supports'      => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
+		'has_archive'   => true,
+	  );
+	  register_post_type( 'Book', $args );
 }
 add_action('init', 'rt_book_custom_post_type');
