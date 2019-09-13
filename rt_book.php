@@ -25,6 +25,9 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+//includes
+include('includes/rt-book-function.php');
+
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
@@ -172,10 +175,40 @@ function rt_book_html($post)
 {
 	wp_nonce_field( 'rt_book_save_meta_data', 'rt_book_meta_box_nonce' );
 
-	$book_meta = get_post_meta( $post->ID ,'_book_meta_key',true);
+	$book_meta_data = get_post_meta( $post->ID ,'_book_meta_key',true);
 
-echo '<label for="book_meta_fields"> Author: ';
-echo '<input type="text" id="author_name" name="author_name" value="'.esc_attr($book_meta).'" required ><br/>';
+	if(!$book_meta_data){
+		$book_meta_data = array(
+			'author_name' => '',
+			'price' => '',
+			'publisher' => '',
+			'year' => '',
+			'edition' => ''
+		);
+	}
+	?>
+<div class="form-group">
+	<label> Author :</label>
+	<input type="text" name="author_name" value="<?php echo $book_meta_data['author_name']; ?>">
+</div>
+<div class="form-group">
+	<label> Price :</label>
+	<input type="text" name="book_price" value="<?php echo $book_meta_data['price']; ?>">
+</div>
+<div class="form-group">
+	<label> Year :</label>
+	<input type="text" name="book_year" value="<?php echo $book_meta_data['year']; ?>">
+</div>
+<div class="form-group">
+	<label> Publisher :</label>
+	<input type="text" name="book_publisher" value="<?php echo $book_meta_data['publisher']; ?>">
+</div>
+<div class="form-group">
+	<label> Edition :</label>
+	<input type="text" name="book_edition" value="<?php echo $book_meta_data['edition']; ?>">
+</div>
+
+	<?php
 
 }
 
@@ -197,25 +230,4 @@ add_action('edit_form_after_title', function() {
     unset($wp_meta_boxes[get_post_type($post)]['advanced']);
 });
 
-
-function rt_book_save_meta_data( $post_id) {
-	if( ! isset( $_POST['rt_book_meta_box_nonce'] ) ) {
-		return;
-	}
-	if( ! wp_verify_nonce( $_POST['rt_book_meta_box_nonce'], 'rt_book_save_meta_data' ) ) {
-		return;
-	}
-	if( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){
-		return;
-	}
-	if( ! current_user_can( 'edit_post' , $post_id ) ) {
-		return;
-	}
-	if( ! isset( $_POST['author_name'] ) ){
-		return;
-	}
-
-	$my_data = sanitize_text_field( $_POST['author_name']);
-		update_post_meta( $post_id , '_book_meta_key' , $my_data );
-}
-add_action( 'save_post', 'rt_book_save_meta_data');
+add_action( 'save_post', 'rt_book_meta_save', 10 ,3 );
