@@ -167,3 +167,55 @@ function rt_book_taxonomies() {
 }
 
 add_action('init' , 'rt_book_taxonomies');
+
+function rt_book_html($post)
+{
+	wp_nonce_field( 'rt_book_save_meta_data', 'rt_book_meta_box_nonce' );
+
+	$book_meta = get_post_meta( $post->ID ,'_book_meta_key',true);
+
+echo '<label for="book_meta_fields"> Author: ';
+echo '<input type="text" id="author_name" name="author_name" value="'.esc_attr($book_meta).'" required ><br/>';
+
+}
+
+function rt_book_custom_meta_box()
+{
+    $screen = 'book';
+        add_meta_box(
+            'rt_book_id',           // Unique ID
+            'Book Meta Details',  	// Box title
+            'rt_book_html',  		// Content callback, must be of type callable
+			$screen				// Post type
+		);
+}
+add_action('add_meta_boxes', 'rt_book_custom_meta_box');
+
+add_action('edit_form_after_title', function() {
+    global $post, $wp_meta_boxes;
+    do_meta_boxes(get_current_screen(), 'advanced', $post);
+    unset($wp_meta_boxes[get_post_type($post)]['advanced']);
+});
+
+
+function rt_book_save_meta_data( $post_id) {
+	if( ! isset( $_POST['rt_book_meta_box_nonce'] ) ) {
+		return;
+	}
+	if( ! wp_verify_nonce( $_POST['rt_book_meta_box_nonce'], 'rt_book_save_meta_data' ) ) {
+		return;
+	}
+	if( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){
+		return;
+	}
+	if( ! current_user_can( 'edit_post' , $post_id ) ) {
+		return;
+	}
+	if( ! isset( $_POST['author_name'] ) ){
+		return;
+	}
+
+	$my_data = sanitize_text_field( $_POST['author_name']);
+		update_post_meta( $post_id , '_book_meta_key' , $my_data );
+}
+add_action( 'save_post', 'rt_book_save_meta_data');
